@@ -20,4 +20,4 @@ Modify src/main.cpp line 28 with NODE_A or NODE_B for building for each board, N
 14. A green led close to the 5V headers should blink approx each second, read description in to of src/main.cpp
 15. With an oscilloscope view the frames being transmited at 4Mbit/s data phase and 1Mbit/s in nominal phase.
 
-
+![alt text](CANFD_oscilloscope.png)
