@@ -12,7 +12,7 @@ Modify src/main.cpp line 28 with NODE_A or NODE_B for building for each board, N
 6. Click the master branch and next.
 7. Browse for a destination directory and click next.
 8. Choose "Import as general project" and click next.
-9. Click Finish
+9. If "A .project file already exists" is mentioned, delete the .project file generated in the destination folder and Click Finish
 10. Click in the Hammer Icon in the toolbar for building the project.
 11. Click the ligthning icon in the toolbar for flashing into the board.
 12. In the list at the left choose "project_name"_Debug_Segger and click flash with the board connected to the Jlink debugger and power.
