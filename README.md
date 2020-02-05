@@ -14,8 +14,8 @@ Modify src/main.cpp line 28 with NODE_A or NODE_B for building for each board, N
 8. Choose "Import as general project" and click next.
 9. Click Finish
 10. Click in the Hammer Icon in the toolbar for building the project.
-11. Click the lignthing icon in the toolbar for flashing into the board.
-12. In the list at the left choose "project_name"_Debug_Segger and click flash.
+11. Click the ligthning icon in the toolbar for flashing into the board.
+12. In the list at the left choose "project_name"_Debug_Segger and click flash with the board connected to the Jlink debugger and power.
 13. Repeat steps 10-13 for the other board but with the macro NODE_A or NODE_B swapped.
 14. A green led close to the 5V headers should blink approx each second, read description in to of src/main.cpp
 15. With an oscilloscope view the frames being transmited at 4Mbit/s data phase and 1Mbit/s in nominal phase.
