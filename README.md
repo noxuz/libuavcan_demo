@@ -14,7 +14,7 @@ Modify src/main.cpp line 28 with NODE_A or NODE_B for building for each board, N
 8. Choose "Import existing Eclipse projects" and click next and then "Finish".
 9. Click in the Hammer Icon in the toolbar for building the project.
 10. Click the yellow ligthning shaped icon in the toolbar for flashing the project into the board.
-11. In the list at the left of the windowd that shows choose "project_name"_Debug_Segger and click flash with the board connected to the Jlink debugger and power.
+11. In the list at the left of the windowd that shows choose "project_name"_Debug_Segger and click flash with the board connected to the Jlink debugger and powered.
 12. Repeat steps 10-13 for the other board but with the macro NODE_A or NODE_B swapped.
 13. A green led close to the 5V headers should blink approx each second, read description in top of src/main.cpp
 14. With an oscilloscope view the frames being transmited at 4Mbit/s data phase and 1Mbit/s in nominal phase.
