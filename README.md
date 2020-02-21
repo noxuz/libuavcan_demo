@@ -8,7 +8,7 @@ Modify src/main.cpp line 28 with NODE_A or NODE_B for building for each board, N
 2. Click File -> Import
 3. Under the Git tab, select "Projects from Git" and next.
 4. Click "Clone URL" and next.
-5. Paste the URL of this repository and click next. https://github.com/noxuz/libuavcanV1_board_DEMO
+5. Paste the URL of this repository and click next. https://github.com/noxuz/libuavcan_demo
 6. Click the master branch and next.
 7. Click "Browse" for the desired destination directory of the project and click next.
 8. Choose "Import existing Eclipse projects" and click next and then "Finish".
