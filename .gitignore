@@ -35,3 +35,11 @@ Debug/
 *.out
 *.app
 *.elf
+/Debug NODE_A/
+/Debug NODE_B/
+/Release NODE_A/
+/Release NODE_B/
+/NODE_A Release/
+/NODE_A Debug/
+/NODE_B Debug/
+/NODE_B Release/

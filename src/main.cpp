@@ -22,23 +22,21 @@
  */
 
 /* Include media layer driver for NXP S32K MCU */
-#include "s32k_libuavcan.hpp"
-
-/* Choose for which board of the demo to target, NODE_A or NODE_B */
-#define NODE_A
+#include "libuavcan/driver/include/s32k_libuavcan.hpp"
 
 /* Function that takes the last 8 bytes from the payload, interprets them as a uint64 and adds 1 */
 void payload_bounceADD(std::uint8_t* rx_payload)
 {
      /* Reinterpret the first 4 bytes from the last 8 btes of the payload as the 
-      * least significat 32-bits from the whole 64-bit variable */
+      * least significant 32-bits from the whole 64-bit variable */
      std::uint64_t payloadLSB =
            static_cast<std::uint64_t>((rx_payload[ 56 ] << 24)   |
                                       (rx_payload[ 57 ] << 16)   |
                                       (rx_payload[ 58 ] << 8)    |
                                       (rx_payload[ 59 ] << 0));
+
      /* Reinterpret the first 4 bytes from the last 8 btes of the payload as the 
-      * least significat 32-bits from the whole 64-bit variable */
+      * least significant 32-bits from the whole 64-bit variable */
      std::uint64_t payloadMSB =
            static_cast<std::uint64_t>((rx_payload[ 60 ] << 24)   |
                                       (rx_payload[ 61 ] << 16)   |
@@ -49,7 +47,7 @@ void payload_bounceADD(std::uint8_t* rx_payload)
      std::uint64_t fullNumber = (std::uint64_t)((std::uint64_t)(payloadLSB << 32) | payloadMSB);
 
      /* Add 1 */
-     fullNumber = fullNUmber++;
+     fullNumber++;
 
      /* Fill-up the payload with the previous number, placing its byte in its place for transmission */
      for(std::uint8_t i = 0; i < 8; i++)
