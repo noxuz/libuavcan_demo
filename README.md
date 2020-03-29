@@ -1,7 +1,7 @@
-# libuavcanV1 demo on NXP UAVCAN node board
+# libuavcanV1 driver demo on NXP UAVCAN node board *UCANS32K146*
 ### Instructions:
 
-Interconnect 2 UAVCAN board nodes (UCANS32K146) with a single JST-GH cable between both board's CAN2 plugs, and the connectors with the 120 ohm terminal.
+Interconnect 2 UAVCAN board nodes with a single JST-GH cable between both board's CAN2 plugs, and the connectors with the 120 ohm terminal.
 
 ![alt text](board_connection.jpg)
 
