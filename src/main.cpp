@@ -27,32 +27,35 @@
 /* Choose for which board of the demo to target, NODE_A or NODE_B */
 #define NODE_A
 
-/* Function that takes the payload and adds 1 */
+/* Function that takes the last 8 bytes from the payload, interprets them as a uint64 and adds 1 */
 void payload_bounceADD(std::uint8_t* rx_payload)
 {
+     /* Reinterpret the first 4 bytes from the last 8 btes of the payload as the 
+      * least significat 32-bits from the whole 64-bit variable */
+     std::uint64_t payloadLSB =
+           static_cast<std::uint64_t>((rx_payload[ 56 ] << 24)   |
+                                      (rx_payload[ 57 ] << 16)   |
+                                      (rx_payload[ 58 ] << 8)    |
+                                      (rx_payload[ 59 ] << 0));
+     /* Reinterpret the first 4 bytes from the last 8 btes of the payload as the 
+      * least significat 32-bits from the whole 64-bit variable */
+     std::uint64_t payloadMSB =
+           static_cast<std::uint64_t>((rx_payload[ 60 ] << 24)   |
+                                      (rx_payload[ 61 ] << 16)   |
+                                      (rx_payload[ 62 ] << 8)    |
+                                      (rx_payload[ 63 ] << 0));
+   
+     /* Construct the 64-bit number from the bytes harvested from theframe's payload */
+     std::uint64_t fullNumber = (std::uint64_t)((std::uint64_t)(payloadLSB << 32) | payloadMSB);
 
-   std::uint64_t payloadLSB =
-         static_cast<std::uint64_t>((rx_payload[ 56 ] << 24)   |
-                                    (rx_payload[ 57 ] << 16)   |
-                                    (rx_payload[ 58 ] << 8)    |
-                                    (rx_payload[ 59 ] << 0));
+     /* Add 1 */
+     fullNumber = fullNUmber++;
 
- std::uint64_t payloadMSB =
-         static_cast<std::uint64_t>((rx_payload[ 60 ] << 24)   |
-                                    (rx_payload[ 61 ] << 16)   |
-                                    (rx_payload[ 62 ] << 8)    |
-                                    (rx_payload[ 63 ] << 0));
-
- std::uint64_t fullNumber = (std::uint64_t)((std::uint64_t)(payloadLSB << 32) | payloadMSB);
-
- /* Add 1 and apply modulo to keep it 64-bit number (AND with 64-bit mask) */
- fullNumber = (std::uint64_t)((std::uint64_t)(fullNumber+1) & 0xFFFFFFFFFFFFFFFF);
-
- /* Fill-up the payload with the previous number */
- for(std::uint8_t i = 0; i < 8; i++)
- {
-     rx_payload[63-i] = (std::uint64_t)((std::uint64_t)( fullNumber & (std::uint64_t)(0xFF << (8*i)) ) >> (8*i));
- }
+     /* Fill-up the payload with the previous number, placing its byte in its place for transmission */
+     for(std::uint8_t i = 0; i < 8; i++)
+     {
+         rx_payload[63-i] = (std::uint64_t)((std::uint64_t)( fullNumber & (std::uint64_t)(0xFF << (8*i)) ) >> (8*i));
+     }
 }
 
 void greenLED_init(void)
@@ -64,8 +67,6 @@ void greenLED_init(void)
 
 }
 
-int main()
-{
 #if defined(NODE_A)
 /* ID for the current UAVCAN node */
 constexpr std::uint32_t Node_ID = 0xC0C0A;
@@ -77,7 +78,6 @@ constexpr std::uint32_t demo_FrameID = 0xC0FFE;
 constexpr std::uint32_t Node_ID = 0xC0FFE;
 /* ID of the frame to transmit */
 constexpr std::uint32_t demo_FrameID = 0xC0C0A;
-
 #endif
 
 constexpr std::uint32_t Node_Mask = 0xFFFFF;   /* All care bits mask for frame filtering */
@@ -87,86 +87,89 @@ constexpr std::size_t First_Instance = 1u;     /* Interface instance used in thi
 
 /* Size of the payload in bytes of the frame to be transmitted */
 constexpr std::uint16_t payload_length = libuavcan::media::S32K_InterfaceGroup::FrameType::MTUBytes;
+
+int main()
+{
+
 /* Frame's Data Length Code in function of it's payload length in bytes */
 libuavcan::media::CAN::FrameDLC demo_DLC = libuavcan::media::S32K_InterfaceGroup::FrameType::lengthToDlc(payload_length);
 
 /* 64-byte payload that will be exchanged between the nodes */
 std::uint8_t demo_payload[payload_length];
 
+/* Initial value of the frame's payload */
+std::fill(demo_payload,demo_payload+payload_length,0);
 
-    std::fill(demo_payload,demo_payload+payload_length,0);
+/* Instantiate factory object */
+libuavcan::media::S32K_InterfaceManager demo_Manager;
 
-    /* Instantiate factory object */
-    libuavcan::media::S32K_InterfaceManager demo_Manager;
+/* Create pointer to Interface object */
+libuavcan::media::S32K_InterfaceGroup* demo_InterfacePtr;
 
-    /* Create pointer to Interface object */
-    libuavcan::media::S32K_InterfaceGroup* demo_InterfacePtr;
+/* Create a frame that will reach NODE_B ID */
+libuavcan::media::S32K_InterfaceGroup::FrameType bouncing_frame_obj(demo_FrameID,demo_payload,demo_DLC);
 
-    /* Create a frame that will reach NODE_B ID */
-    libuavcan::media::S32K_InterfaceGroup::FrameType bouncing_frame_obj(demo_FrameID,demo_payload,demo_DLC);
+/* Array of frames to transmit (current implementation supports 1) */
+libuavcan::media::S32K_InterfaceGroup::FrameType bouncing_frame[Node_Frame_Count] = {bouncing_frame_obj};
 
-    /* Array of frames to transmit (current implementation supports 1) */
-    libuavcan::media::S32K_InterfaceGroup::FrameType bouncing_frame[Node_Frame_Count] = {bouncing_frame_obj};
+/* Instantiate the filter object that the current node will apply to receiving frames */
+libuavcan::media::S32K_InterfaceGroup::FrameType::Filter demo_Filter(Node_ID,Node_Mask);
 
-    /* Instantiate the filter object that the current node will apply to receiving frames */
-    libuavcan::media::S32K_InterfaceGroup::FrameType::Filter demo_Filter(Node_ID,Node_Mask);
+std::uint32_t rx_msg_count = 0;
 
+/* Status variable for sequence control */
+libuavcan::Result status;
 
-    std::uint32_t rx_msg_count = 0;
+/* Initialize the node with the previously defined filtering using factory method */
+status = demo_Manager.startInterfaceGroup(&demo_Filter,Node_Filters_Count,demo_InterfacePtr);
 
-    /* Status variable for sequence control */
-    libuavcan::Result status;
+greenLED_init();
 
-    /* Initialize the node with the previously defined filtering using factory method */
-    status = demo_Manager.startInterfaceGroup(&demo_Filter,Node_Filters_Count,demo_InterfacePtr);
-
-    greenLED_init();
-
-    /* Node A kickstarts */
-    #ifdef NODE_A
-
-        std::size_t frames_wrote = 0;
-        if ( libuavcan::isSuccess(status) )
-        {
-            demo_InterfacePtr->write(First_Instance,bouncing_frame,Node_Frame_Count,frames_wrote);
-        }
-    #endif
-
-    /* Loop for retransmission of the frame */
-    for(;;)
+/* Node A kickstarts */
+#ifdef NODE_A
+    std::size_t frames_wrote = 0;
+   if ( libuavcan::isSuccess(status) )
     {
-        std::size_t frames_read = 0;
-
-        if ( libuavcan::isSuccess(status) )
-        {
-            status = demo_InterfacePtr->read(First_Instance, bouncing_frame, frames_read);
-        }
-
-        if(frames_read)
-        {
-            /* Increment receive msg counter */
-            rx_msg_count++;
-
-            if ( rx_msg_count == 1000 )
-            {
-                PTD->PTOR |= 1<<16;    /* toggle output port D16 (Green LED) */
-                rx_msg_count = 0;      /* and reset message counter */
-            }
-
-
-            /* Transmit back */
-            std::size_t frames_wrote;
-
-            /* Changed frame's ID for returning it back */
-            bouncing_frame[0].id = demo_FrameID;
-
-            payload_bounceADD(bouncing_frame[0].data);
-
-            if ( libuavcan::isSuccess(status) )
-            {
-                status = demo_InterfacePtr->write(First_Instance, bouncing_frame, Node_Frame_Count, frames_wrote);
-            }
-        }
+        demo_InterfacePtr->write(First_Instance,bouncing_frame,Node_Frame_Count,frames_wrote);
     }
+#endif
+
+/* Super-loop for retransmission of the frame */
+for(;;)
+{
+    std::size_t frames_read = 0;
+
+    if ( libuavcan::isSuccess(status) )
+    {
+       status = demo_InterfacePtr->read(First_Instance, bouncing_frame, frames_read);
+    }
+
+    /* frames_read should be 1 from he previous read method if a frame was received */
+    if(frames_read)
+    {
+         /* Increment receive msg counter */
+         rx_msg_count++;
+
+         if ( rx_msg_count == 1000 )
+         {
+             PTD->PTOR |= 1<<16;    /* Toggle green LED*/
+             rx_msg_count = 0;      /* Reset th counter of received frames */
+         }
+
+         std::size_t frames_wrote;
+
+         /* Swap the frame's ID for returning it back to the sender */
+         bouncing_frame[0].id = demo_FrameID;
+
+         /* The frame is sent back bt with the payload  */
+         payload_bounceADD(bouncing_frame[0].data);
+
+         /* Perform transmission */
+         if ( libuavcan::isSuccess(status) )
+         {
+             status = demo_InterfacePtr->write(First_Instance, bouncing_frame, Node_Frame_Count, frames_wrote);
+         }
+    }
+}
 
 }
