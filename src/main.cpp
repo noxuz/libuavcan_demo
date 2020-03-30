@@ -22,7 +22,7 @@
  */
 
 /* Include media layer driver for NXP S32K MCU */
-#include "libuavcan/driver/include/s32k_libuavcan.hpp"
+#include <libuavcan/driver/include/canfd.hpp>
 
 /* Function that takes the last 8 bytes from the payload, interprets them as a uint64 and adds 1 */
 void payload_bounceADD(std::uint8_t* rx_payload)
@@ -84,13 +84,13 @@ constexpr std::size_t Node_Frame_Count = 1u;   /* Frames transmitted each time *
 constexpr std::size_t First_Instance = 1u;     /* Interface instance used in this demo */
 
 /* Size of the payload in bytes of the frame to be transmitted */
-constexpr std::uint16_t payload_length = libuavcan::media::S32K_InterfaceGroup::FrameType::MTUBytes;
+constexpr std::uint16_t payload_length = libuavcan::media::S32K::InterfaceGroup::FrameType::MTUBytes;
 
 int main()
 {
 
 /* Frame's Data Length Code in function of it's payload length in bytes */
-libuavcan::media::CAN::FrameDLC demo_DLC = libuavcan::media::S32K_InterfaceGroup::FrameType::lengthToDlc(payload_length);
+libuavcan::media::CAN::FrameDLC demo_DLC = libuavcan::media::S32K::InterfaceGroup::FrameType::lengthToDlc(payload_length);
 
 /* 64-byte payload that will be exchanged between the nodes */
 std::uint8_t demo_payload[payload_length];
@@ -99,19 +99,19 @@ std::uint8_t demo_payload[payload_length];
 std::fill(demo_payload,demo_payload+payload_length,0);
 
 /* Instantiate factory object */
-libuavcan::media::S32K_InterfaceManager demo_Manager;
+libuavcan::media::S32K::InterfaceManager demo_Manager;
 
 /* Create pointer to Interface object */
-libuavcan::media::S32K_InterfaceGroup* demo_InterfacePtr;
+libuavcan::media::S32K::InterfaceGroup* demo_InterfacePtr;
 
 /* Create a frame that will reach NODE_B ID */
-libuavcan::media::S32K_InterfaceGroup::FrameType bouncing_frame_obj(demo_FrameID,demo_payload,demo_DLC);
+libuavcan::media::S32K::InterfaceGroup::FrameType bouncing_frame_obj(demo_FrameID,demo_payload,demo_DLC);
 
 /* Array of frames to transmit (current implementation supports 1) */
-libuavcan::media::S32K_InterfaceGroup::FrameType bouncing_frame[Node_Frame_Count] = {bouncing_frame_obj};
+libuavcan::media::S32K::InterfaceGroup::FrameType bouncing_frame[Node_Frame_Count] = {bouncing_frame_obj};
 
 /* Instantiate the filter object that the current node will apply to receiving frames */
-libuavcan::media::S32K_InterfaceGroup::FrameType::Filter demo_Filter(Node_ID,Node_Mask);
+libuavcan::media::S32K::InterfaceGroup::FrameType::Filter demo_Filter(Node_ID,Node_Mask);
 
 std::uint32_t rx_msg_count = 0;
 
