@@ -22,7 +22,8 @@
  */
 
 /* Include media layer driver for NXP S32K MCU */
-#include <libuavcan/driver/include/canfd.hpp>
+#include "libuavcan/media/S32K/canfd.hpp"
+#include "S32K146.h"
 
 /* Function that takes the last 8 bytes from the payload, interprets them as a uint64 and adds 1 */
 void payload_bounceADD(std::uint8_t* rx_payload)
