@@ -7,16 +7,15 @@
 /**
  * @file
  * Header driver file for the media layer of Libuavcan v1 targeting
- * the NXP S32K14 family of automotive grade MCU's running
+ * the NXP S32K14 family of automotive grade MCU's, running
  * CAN-FD at 4Mbit/s data phase and 1Mbit/s in nominal phase.
  */
 
 #ifndef CANFD_HPP_INCLUDED
 #define CANFD_HPP_INCLUDED
 
-/* Interface class declarations for the current S32K driver implementation */
-#include "libuavcan/media/interfaces.hpp"
 #include "libuavcan/media/can.hpp"
+#include "libuavcan/media/interfaces.hpp"
 
 namespace libuavcan
 {
@@ -147,7 +146,7 @@ public:
      * Release and deinitialize the peripherals needed for the current driver, disables all the FlexCAN
      * instances available, waiting for any pending transmission or reception to finish before. Also
      * resets the LPIT timer used for time-stamping, does not deconfigure the core and asynch clock sources.
-    ¨* configured from startInterfaceGroup nor the pins.
+    Â¨* configured from startInterfaceGroup nor the pins.
      * @param [out]  inout_group Pointer that will be set to null
      * @return libuavcan::Result::Success. If the used peripherals were deinitialized properly.
      */
