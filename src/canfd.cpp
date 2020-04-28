@@ -292,9 +292,6 @@ public:
                 /* Get the id */
                 std::uint32_t id_ISR = (FlexCAN[instance]->RAMn[MB_index * MB_Size_Words + 1]) & CAN_WMBn_ID_ID_MASK;
 
-                /* Array for harvesting the received frame's payload */
-                std::uint32_t data_ISR_word[(payloadLength_ISR >> 2) + std::min(1, (payloadLength_ISR & 0x3))];
-
                 /* Perform the harvesting of the payload, leveraging from native 32-bit transfers and since the FlexCAN
                  * expects the data to be in big-endian order, a byte swap is required from the little-endian
                  * transmission UAVCAN requirement */
