@@ -126,8 +126,10 @@ greenLED_init();
 
 /* Node A kickstarts */
 #ifdef NODE_A
+    /* Toggle LED initially so it turns on complementary in each node */
+    PTD->PTOR |= 1<<16;
     std::size_t frames_wrote = 0;
-   if ( libuavcan::isSuccess(status) )
+    if ( libuavcan::isSuccess(status) )
     {
         demo_InterfacePtr->write(First_Instance,bouncing_frame,Node_Frame_Count,frames_wrote);
     }
@@ -160,7 +162,7 @@ for(;;)
          /* Swap the frame's ID for returning it back to the sender */
          bouncing_frame[0].id = demo_FrameID;
 
-         /* The frame is sent back bt with the payload  */
+         /* The frame is sent back with the payload treated as a 64-bit number added 1 to it */
          payload_bounceADD(bouncing_frame[0].data);
 
          /* Perform transmission */
